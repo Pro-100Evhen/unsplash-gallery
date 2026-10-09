@@ -1,0 +1,69 @@
+export type UnsplashErrorCategory =
+  "unauthorized" | "rate-limit" | "not-found" | "network" | "unknown";
+
+interface UnsplashApiErrorOptions {
+  category: UnsplashErrorCategory;
+  status?: number | null;
+  cause?: unknown;
+}
+
+export class UnsplashApiError extends Error {
+  readonly category: UnsplashErrorCategory;
+  readonly status: number | null;
+
+  constructor(message: string, options: UnsplashApiErrorOptions) {
+    super(message, { cause: options.cause });
+    this.name = "UnsplashApiError";
+    this.category = options.category;
+    this.status = options.status ?? null;
+  }
+}
+
+export function createUnsplashHttpError(status: number): UnsplashApiError {
+  switch (status) {
+    case 401:
+      return new UnsplashApiError("Unsplash request is unauthorized.", {
+        category: "unauthorized",
+        status,
+      });
+    case 403:
+      return new UnsplashApiError("Unsplash rate limit has been reached.", {
+        category: "rate-limit",
+        status,
+      });
+    case 404:
+      return new UnsplashApiError(
+        "The requested Unsplash resource was not found.",
+        {
+          category: "not-found",
+          status,
+        },
+      );
+    default:
+      return new UnsplashApiError(
+        `Unsplash request failed with status ${status}.`,
+        {
+          category: "unknown",
+          status,
+        },
+      );
+  }
+}
+
+export function normalizeUnsplashError(error: unknown): UnsplashApiError {
+  if (error instanceof UnsplashApiError) {
+    return error;
+  }
+
+  if (error instanceof TypeError) {
+    return new UnsplashApiError("Unable to reach Unsplash.", {
+      category: "network",
+      cause: error,
+    });
+  }
+
+  return new UnsplashApiError("Unexpected Unsplash error.", {
+    category: "unknown",
+    cause: error,
+  });
+}

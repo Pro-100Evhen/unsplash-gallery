@@ -1,0 +1,21 @@
+@use "../../styles/mixins" as mixins;
+@use "../../styles/tokens" as tokens;
+
+.container {
+  width: 100%;
+  max-width: tokens.$container-max-width;
+  margin-inline: auto;
+  padding-inline: tokens.$space-4;
+
+  @include mixins.from(tokens.$breakpoint-tablet) {
+    padding-inline: tokens.$space-6;
+  }
+
+  @include mixins.from(tokens.$breakpoint-desktop) {
+    padding-inline: tokens.$space-8;
+  }
+
+  @include mixins.from(tokens.$breakpoint-wide) {
+    padding-inline: tokens.$space-10;
+  }
+}

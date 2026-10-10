@@ -1,0 +1,102 @@
+@use "../../styles/tokens" as tokens;
+@use "../../styles/mixins" as mixins;
+
+.details {
+  display: grid;
+  gap: tokens.$space-8;
+  padding-block: tokens.$space-6 tokens.$space-12;
+}
+
+.imageFrame {
+  display: grid;
+  min-height: 280px;
+  max-height: min(72vh, 900px);
+  place-items: center;
+  overflow: hidden;
+  border-radius: 16px;
+  background: #f3f3f3;
+}
+
+.image {
+  width: 100%;
+  height: auto;
+  max-height: min(72vh, 900px);
+  object-fit: contain;
+}
+
+.content {
+  display: grid;
+  gap: tokens.$space-6;
+  width: min(100%, 880px);
+  margin-inline: auto;
+}
+
+.author {
+  min-width: 0;
+}
+
+.description {
+  max-width: 70ch;
+  white-space: pre-line;
+}
+
+.metadata {
+  padding: tokens.$space-4 0;
+  margin: 0;
+  border-block: 1px solid #e8e8e8;
+  color: var(--mui-palette-text-secondary);
+}
+
+.metadataItem {
+  display: flex;
+  align-items: center;
+  gap: tokens.$space-2;
+
+  dd {
+    margin: 0;
+  }
+}
+
+.tags {
+  display: grid;
+  gap: tokens.$space-3;
+}
+
+.tagList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: tokens.$space-2;
+}
+
+.tagLink {
+  color: inherit;
+  text-decoration: none;
+  border-radius: 999px;
+
+  &:focus-visible {
+    outline: 3px solid currentColor;
+    outline-offset: 2px;
+  }
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@include mixins.from(tokens.$breakpoint-tablet) {
+  .details {
+    padding-block: tokens.$space-8 tokens.$space-12;
+  }
+
+  .imageFrame {
+    min-height: 480px;
+  }
+}

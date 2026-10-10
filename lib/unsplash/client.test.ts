@@ -113,7 +113,7 @@ describe("Unsplash client", () => {
     expect(cacheLife).toHaveBeenCalledWith("hours");
   });
 
-  it("gets and maps full photo details", async () => {
+  it("gets and maps full photo details without a cache error boundary", async () => {
     const fetchMock = vi.fn().mockResolvedValue(
       mockResponse({
         ...apiPhoto,
@@ -137,7 +137,7 @@ describe("Unsplash client", () => {
       tags: [{ title: "mountain" }],
       location: null,
     });
-    expect(cacheLife).toHaveBeenCalledWith("hours");
+    expect(cacheLife).not.toHaveBeenCalled();
   });
 
   it.each([

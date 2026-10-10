@@ -125,9 +125,6 @@ export async function searchPhotos(
 }
 
 export async function getPhoto(id: string): Promise<PhotoDetails> {
-  "use cache";
-  cacheLife("hours");
-
   const response = await requestUnsplash<UnsplashApiPhoto>(
     `photos/${encodeURIComponent(id)}`,
   );

@@ -1,16 +1,24 @@
 import type {
+  GalleryPhoto,
   PhotoDetails,
   PhotoLocation,
   PhotoSummary,
   PhotoTag,
-  UnsplashApiPhoto,
-  UnsplashApiUser,
-} from "./types";
+} from "@/domain/photo/types";
+import type { UnsplashApiPhoto, UnsplashApiUser } from "./types";
 
 function normalizeText(value: string | null | undefined): string | null {
   const normalizedValue = value?.trim();
 
   return normalizedValue ? normalizedValue : null;
+}
+
+function getAltDescription(photo: UnsplashApiPhoto): string {
+  return (
+    normalizeText(photo.alt_description) ??
+    normalizeText(photo.description) ??
+    `Photo by ${photo.user.name}`
+  );
 }
 
 function mapAuthor(user: UnsplashApiUser): PhotoSummary["author"] {
@@ -44,12 +52,6 @@ function mapLocation(photo: UnsplashApiPhoto): PhotoLocation | null {
 }
 
 export function mapPhotoSummary(photo: UnsplashApiPhoto): PhotoSummary {
-  const description = normalizeText(photo.description);
-  const altDescription =
-    normalizeText(photo.alt_description) ??
-    description ??
-    `Photo by ${photo.user.name}`;
-
   return {
     id: photo.id,
     createdAt: photo.created_at,
@@ -57,7 +59,7 @@ export function mapPhotoSummary(photo: UnsplashApiPhoto): PhotoSummary {
     height: photo.height,
     color: photo.color,
     blurHash: photo.blur_hash,
-    altDescription,
+    altDescription: getAltDescription(photo),
     urls: {
       raw: photo.urls.raw,
       full: photo.urls.full,
@@ -67,6 +69,23 @@ export function mapPhotoSummary(photo: UnsplashApiPhoto): PhotoSummary {
     },
     unsplashUrl: photo.links.html,
     author: mapAuthor(photo.user),
+  };
+}
+
+export function mapGalleryPhoto(photo: UnsplashApiPhoto): GalleryPhoto {
+  return {
+    id: photo.id,
+    width: photo.width,
+    height: photo.height,
+    color: photo.color,
+    altDescription: getAltDescription(photo),
+    urls: { regular: photo.urls.regular },
+    unsplashUrl: photo.links.html,
+    author: {
+      name: photo.user.name,
+      profileImageUrl: photo.user.profile_image.medium,
+      profileUrl: photo.user.links.html,
+    },
   };
 }
 

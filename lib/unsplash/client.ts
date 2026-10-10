@@ -1,18 +1,14 @@
 import "server-only";
 
 import { cacheLife } from "next/cache";
+import type { PaginatedPhotos, PhotoDetails } from "@/domain/photo/types";
 import {
   UnsplashApiError,
   createUnsplashHttpError,
   normalizeUnsplashError,
 } from "./errors";
-import { mapPhotoDetails, mapPhotoSummary } from "./mappers";
-import type {
-  PaginatedPhotos,
-  PhotoDetails,
-  UnsplashApiPhoto,
-  UnsplashApiSearchResponse,
-} from "./types";
+import { mapGalleryPhoto, mapPhotoDetails } from "./mappers";
+import type { UnsplashApiPhoto, UnsplashApiSearchResponse } from "./types";
 
 const UNSPLASH_API_URL = "https://api.unsplash.com/";
 const DEFAULT_PER_PAGE = 20;
@@ -80,7 +76,7 @@ export async function listPhotos(
   perPage = DEFAULT_PER_PAGE,
 ): Promise<PaginatedPhotos> {
   "use cache";
-  cacheLife("minutes");
+  cacheLife("hours");
 
   const searchParams = new URLSearchParams({
     page: String(page),
@@ -93,7 +89,7 @@ export async function listPhotos(
   const total = parseTotal(response.headers.get("x-total"));
 
   return {
-    items: response.data.map(mapPhotoSummary),
+    items: response.data.map(mapGalleryPhoto),
     page,
     perPage,
     total,
@@ -107,7 +103,7 @@ export async function searchPhotos(
   perPage = DEFAULT_PER_PAGE,
 ): Promise<PaginatedPhotos> {
   "use cache";
-  cacheLife("minutes");
+  cacheLife("hours");
 
   const searchParams = new URLSearchParams({
     query,
@@ -120,7 +116,7 @@ export async function searchPhotos(
   );
 
   return {
-    items: response.data.results.map(mapPhotoSummary),
+    items: response.data.results.map(mapGalleryPhoto),
     page,
     perPage,
     total: response.data.total,
@@ -130,7 +126,7 @@ export async function searchPhotos(
 
 export async function getPhoto(id: string): Promise<PhotoDetails> {
   "use cache";
-  cacheLife("minutes");
+  cacheLife("hours");
 
   const response = await requestUnsplash<UnsplashApiPhoto>(
     `photos/${encodeURIComponent(id)}`,

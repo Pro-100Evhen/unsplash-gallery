@@ -1,38 +1,42 @@
-import { io } from "next/cache";
 import { Typography } from "@mui/material";
+import { io } from "next/cache";
+import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { EmptyState } from "@/components/feedback/EmptyState";
-import { GallerySkeleton } from "@/components/feedback/GallerySkeleton";
+import { GalleryLoadingState } from "@/components/feedback/GalleryLoadingState";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { GalleryView } from "@/features/gallery/GalleryView";
-import { searchSchema } from "@/features/search/searchSchema";
-import { listPhotos, searchPhotos } from "@/lib/unsplash/client";
+import {
+  GALLERY_PER_PAGE,
+  parsePageParam,
+  shouldRedirectPageParam,
+} from "@/features/gallery/pagination";
+import { listPhotos } from "@/lib/unsplash/client";
 import styles from "./page.module.scss";
 
-type HomeSearchParams = Promise<{
-  query?: string | string[];
-}>;
+type HomeSearchParams = Promise<{ page?: string | string[] }>;
 
-export async function PhotoFeed({ query = "" }: { query?: string }) {
+export async function PhotoFeed({ page = 1 }: { page?: number }) {
   await io();
+  const photos = await listPhotos(page, GALLERY_PER_PAGE);
 
-  const photos = query ? await searchPhotos(query) : await listPhotos();
-  const { items } = photos;
-  const title = query ? `Results for “${query}”` : "Discover Photos";
+  if (
+    photos.totalPages !== null &&
+    photos.totalPages > 0 &&
+    page > photos.totalPages
+  ) {
+    redirect(`/?page=${photos.totalPages}`);
+  }
 
-  if (items.length === 0) {
+  if (photos.items.length === 0) {
     return (
       <>
         <Typography component="h1" variant="h2">
-          {title}
+          Discover Photos
         </Typography>
         <EmptyState
-          title={query ? "No photos found" : "No photos yet"}
-          description={
-            query
-              ? "Try another search term."
-              : "Unsplash did not return any photos. Please try again later."
-          }
+          title="No photos yet"
+          description="Unsplash did not return any photos. Please try again later."
         />
       </>
     );
@@ -40,41 +44,31 @@ export async function PhotoFeed({ query = "" }: { query?: string }) {
 
   return (
     <GalleryView
-      key={query || "discover"}
-      photos={items}
-      title={title}
-      query={query}
-      initialPage={photos.page}
+      photos={photos.items}
+      title="Discover Photos"
+      page={photos.page}
       totalPages={photos.totalPages}
     />
   );
 }
 
-async function SearchAwarePhotoFeed({
+async function PaginatedPhotoFeed({
   searchParams,
 }: {
   searchParams: HomeSearchParams;
 }) {
-  const { query: rawQuery } = await searchParams;
-  const candidate = typeof rawQuery === "string" ? rawQuery.trim() : "";
-  const parsedQuery = candidate
-    ? searchSchema.safeParse({ query: candidate })
-    : null;
+  const { page } = await searchParams;
+  const parsedPage = parsePageParam(page);
 
-  return (
-    <PhotoFeed query={parsedQuery?.success ? parsedQuery.data.query : ""} />
-  );
+  if (shouldRedirectPageParam(page)) {
+    redirect(parsedPage === 1 ? "/" : `/?page=${parsedPage}`);
+  }
+
+  return <PhotoFeed page={parsedPage} />;
 }
 
 function PhotoFeedFallback() {
-  return (
-    <>
-      <Typography component="h1" variant="h2">
-        Loading photos…
-      </Typography>
-      <GallerySkeleton />
-    </>
-  );
+  return <GalleryLoadingState title="Loading photos…" />;
 }
 
 export default function Home({
@@ -86,7 +80,7 @@ export default function Home({
     <main className={styles.main}>
       <PageContainer>
         <Suspense fallback={<PhotoFeedFallback />}>
-          <SearchAwarePhotoFeed searchParams={searchParams} />
+          <PaginatedPhotoFeed searchParams={searchParams} />
         </Suspense>
       </PageContainer>
     </main>

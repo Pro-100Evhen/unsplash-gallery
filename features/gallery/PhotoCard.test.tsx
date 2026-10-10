@@ -1,32 +1,9 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import type { PhotoSummary } from "@/lib/unsplash/types";
+import { galleryPhotoFixture } from "@/test/fixtures/photos";
 import { PhotoCard } from "./PhotoCard";
 
-const photoFixture: PhotoSummary = {
-  id: "photo/one",
-  createdAt: "2026-01-10T12:00:00Z",
-  width: 2400,
-  height: 1600,
-  color: "#aabbcc",
-  blurHash: null,
-  altDescription: "A lake surrounded by mountains",
-  urls: {
-    raw: "https://images.unsplash.com/raw",
-    full: "https://images.unsplash.com/full",
-    regular: "https://images.unsplash.com/regular",
-    small: "https://images.unsplash.com/small",
-    thumb: "https://images.unsplash.com/thumb",
-  },
-  unsplashUrl: "https://unsplash.com/photos/photo-one",
-  author: {
-    id: "user-1",
-    username: "ada",
-    name: "Ada Example",
-    profileImageUrl: "https://images.unsplash.com/profile",
-    profileUrl: "https://unsplash.com/@ada",
-  },
-};
+const photoFixture = { ...galleryPhotoFixture, id: "photo/one" };
 
 describe("PhotoCard", () => {
   it("links the image to the encoded photo details route without nesting attribution links", () => {
@@ -101,4 +78,10 @@ describe("PhotoCard", () => {
       expect(screen.getByRole("img")).toHaveAttribute("sizes", sizes);
     },
   );
+
+  it("eagerly loads an above-the-fold photo when requested", () => {
+    render(<PhotoCard photo={photoFixture} density="comfortable" eager />);
+
+    expect(screen.getByRole("img")).toHaveAttribute("loading", "eager");
+  });
 });

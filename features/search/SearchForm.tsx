@@ -24,34 +24,16 @@ import {
   searchSchema,
   type SearchFormValues,
 } from "./searchSchema";
+import {
+  createSearchHref,
+  getSearchNavigationDelay,
+  shouldAutoSearch,
+} from "./searchNavigation";
 import styles from "./SearchForm.module.scss";
 
 type SearchFormProps = Readonly<{
   initialQuery?: string;
 }>;
-
-export const SEARCH_DEBOUNCE_MS = 400;
-export const SEARCH_THROTTLE_MS = 1_000;
-
-export function getSearchNavigationDelay(
-  lastNavigationAt: number,
-  now: number,
-): number {
-  const throttleDelay = Math.max(
-    0,
-    SEARCH_THROTTLE_MS - (now - lastNavigationAt),
-  );
-
-  return Math.max(SEARCH_DEBOUNCE_MS, throttleDelay);
-}
-
-function createSearchHref(query: string): string {
-  if (!query) {
-    return "/";
-  }
-
-  return `/?${new URLSearchParams({ query }).toString()}`;
-}
 
 export function SearchForm({ initialQuery = "" }: SearchFormProps) {
   const router = useRouter();
@@ -107,6 +89,10 @@ export function SearchForm({ initialQuery = "" }: SearchFormProps) {
     const nextQuery = query.trim();
 
     if (nextQuery === urlQuery) {
+      return;
+    }
+
+    if (!shouldAutoSearch(nextQuery)) {
       return;
     }
 

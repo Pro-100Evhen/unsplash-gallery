@@ -1,38 +1,13 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
-import type { PhotoSummary } from "@/lib/unsplash/types";
+import { galleryPhotoFixture } from "@/test/fixtures/photos";
 import { GalleryView } from "./GalleryView";
-
-const photo: PhotoSummary = {
-  id: "photo-one",
-  createdAt: "2026-01-10T12:00:00Z",
-  width: 2400,
-  height: 1600,
-  color: "#aabbcc",
-  blurHash: null,
-  altDescription: "A lake surrounded by mountains",
-  urls: {
-    raw: "https://images.unsplash.com/raw",
-    full: "https://images.unsplash.com/full",
-    regular: "https://images.unsplash.com/regular",
-    small: "https://images.unsplash.com/small",
-    thumb: "https://images.unsplash.com/thumb",
-  },
-  unsplashUrl: "https://unsplash.com/photos/photo-one",
-  author: {
-    id: "user-one",
-    username: "ada",
-    name: "Ada Example",
-    profileImageUrl: "https://images.unsplash.com/profile",
-    profileUrl: "https://unsplash.com/@ada",
-  },
-};
 
 describe("GalleryControls", () => {
   it("starts in comfortable mode and switches to compact mode", async () => {
     const user = userEvent.setup();
-    render(<GalleryView photos={[photo]} />);
+    render(<GalleryView photos={[galleryPhotoFixture]} />);
 
     const comfortableButton = screen.getByRole("button", {
       name: "Comfortable gallery view",
@@ -54,7 +29,7 @@ describe("GalleryControls", () => {
 
   it("keeps the selected mode when its button is clicked again", async () => {
     const user = userEvent.setup();
-    render(<GalleryView photos={[photo]} />);
+    render(<GalleryView photos={[galleryPhotoFixture]} />);
     const comfortableButton = screen.getByRole("button", {
       name: "Comfortable gallery view",
     });
@@ -66,7 +41,7 @@ describe("GalleryControls", () => {
 
   it("supports keyboard navigation and activation", async () => {
     const user = userEvent.setup();
-    render(<GalleryView photos={[photo]} />);
+    render(<GalleryView photos={[galleryPhotoFixture]} />);
 
     await user.tab();
     expect(

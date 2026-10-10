@@ -84,7 +84,7 @@ describe("Unsplash client", () => {
     });
     expect(result.items[0]?.id).toBe("photo-1");
     expect(JSON.stringify(result)).not.toContain("test-access-key");
-    expect(cacheLife).toHaveBeenCalledWith("minutes");
+    expect(cacheLife).toHaveBeenCalledWith("hours");
   });
 
   it("searches photos using encoded query parameters", async () => {
@@ -110,7 +110,7 @@ describe("Unsplash client", () => {
       totalPages: 1,
     });
     expect(result.items[0]?.author.name).toBe("Ada Example");
-    expect(cacheLife).toHaveBeenCalledWith("minutes");
+    expect(cacheLife).toHaveBeenCalledWith("hours");
   });
 
   it("gets and maps full photo details", async () => {
@@ -137,7 +137,7 @@ describe("Unsplash client", () => {
       tags: [{ title: "mountain" }],
       location: null,
     });
-    expect(cacheLife).toHaveBeenCalledWith("minutes");
+    expect(cacheLife).toHaveBeenCalledWith("hours");
   });
 
   it.each([

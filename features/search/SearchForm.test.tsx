@@ -1,12 +1,7 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import {
-  getSearchNavigationDelay,
-  SEARCH_DEBOUNCE_MS,
-  SEARCH_THROTTLE_MS,
-  SearchForm,
-} from "./SearchForm";
+import { SearchForm } from "./SearchForm";
 
 const { navigationState, replaceMock } = vi.hoisted(() => ({
   navigationState: { searchParams: new URLSearchParams() },
@@ -54,7 +49,7 @@ describe("SearchForm", () => {
     await user.click(screen.getByRole("button", { name: "Search" }));
 
     await waitFor(() => {
-      expect(replaceMock).toHaveBeenCalledWith("/?query=mountain+lake");
+      expect(replaceMock).toHaveBeenCalledWith("/search?query=mountain+lake");
     });
   });
 
@@ -66,7 +61,7 @@ describe("SearchForm", () => {
     await user.type(input, "ocean{Enter}");
 
     await waitFor(() => {
-      expect(replaceMock).toHaveBeenCalledWith("/?query=ocean");
+      expect(replaceMock).toHaveBeenCalledWith("/search?query=ocean");
     });
   });
 
@@ -84,7 +79,7 @@ describe("SearchForm", () => {
     await waitFor(
       () => {
         expect(replaceMock).toHaveBeenCalledOnce();
-        expect(replaceMock).toHaveBeenCalledWith("/?query=forest");
+        expect(replaceMock).toHaveBeenCalledWith("/search?query=forest");
       },
       { timeout: 1000 },
     );
@@ -94,12 +89,6 @@ describe("SearchForm", () => {
     ).toBeVisible();
   });
 
-  it("throttles searches that follow a recent navigation", () => {
-    expect(getSearchNavigationDelay(1_000, 1_250)).toBe(750);
-    expect(getSearchNavigationDelay(1_000, 2_000)).toBe(SEARCH_DEBOUNCE_MS);
-    expect(SEARCH_THROTTLE_MS).toBe(1_000);
-  });
-
   it("keeps a cleared input empty when the previous search finishes", async () => {
     const user = userEvent.setup();
     const { rerender } = render(<SearchForm />);
@@ -107,7 +96,7 @@ describe("SearchForm", () => {
 
     await user.type(input, "forest");
     await waitFor(() => {
-      expect(replaceMock).toHaveBeenCalledWith("/?query=forest");
+      expect(replaceMock).toHaveBeenCalledWith("/search?query=forest");
     });
 
     await user.clear(input);

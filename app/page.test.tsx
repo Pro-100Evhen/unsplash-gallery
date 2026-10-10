@@ -1,48 +1,31 @@
 import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { PaginatedPhotos } from "@/lib/unsplash/types";
+import type { PaginatedPhotos } from "@/domain/photo/types";
+import { galleryPhotoFixture } from "@/test/fixtures/photos";
 
-const { listPhotosMock, searchPhotosMock } = vi.hoisted(() => ({
+const { listPhotosMock, redirectMock } = vi.hoisted(() => ({
   listPhotosMock: vi.fn(),
-  searchPhotosMock: vi.fn(),
+  redirectMock: vi.fn(() => {
+    throw new Error("NEXT_REDIRECT");
+  }),
 }));
 
-vi.mock("next/cache", () => ({
-  io: vi.fn().mockResolvedValue(undefined),
+vi.mock("next/cache", () => ({ io: vi.fn().mockResolvedValue(undefined) }));
+vi.mock("next/navigation", () => ({
+  redirect: redirectMock,
+  usePathname: () => "/",
+  useRouter: () => ({ push: vi.fn() }),
+  useSearchParams: () => new URLSearchParams(),
 }));
-
-vi.mock("@/lib/unsplash/client", () => ({
-  listPhotos: listPhotosMock,
-  searchPhotos: searchPhotosMock,
-}));
+vi.mock("@/lib/unsplash/client", () => ({ listPhotos: listPhotosMock }));
 
 import { PhotoFeed } from "./page";
 
 const response: PaginatedPhotos = {
   items: [
     {
-      id: "photo-one",
-      createdAt: "2026-01-10T12:00:00Z",
-      width: 2400,
-      height: 1600,
-      color: "#aabbcc",
-      blurHash: null,
+      ...galleryPhotoFixture,
       altDescription: "A server-rendered mountain lake",
-      urls: {
-        raw: "https://images.unsplash.com/raw",
-        full: "https://images.unsplash.com/full",
-        regular: "https://images.unsplash.com/regular",
-        small: "https://images.unsplash.com/small",
-        thumb: "https://images.unsplash.com/thumb",
-      },
-      unsplashUrl: "https://unsplash.com/photos/photo-one",
-      author: {
-        id: "user-one",
-        username: "ada",
-        name: "Ada Example",
-        profileImageUrl: "https://images.unsplash.com/profile",
-        profileUrl: "https://unsplash.com/@ada",
-      },
     },
   ],
   page: 1,
@@ -54,14 +37,14 @@ const response: PaginatedPhotos = {
 describe("PhotoFeed", () => {
   beforeEach(() => {
     listPhotosMock.mockReset();
-    searchPhotosMock.mockReset();
+    redirectMock.mockClear();
   });
 
-  it("returns photo content from the server data request", async () => {
+  it("returns photo content from the selected server page", async () => {
     listPhotosMock.mockResolvedValue(response);
+    render(await PhotoFeed({ page: 1 }));
 
-    render(await PhotoFeed({ query: "" }));
-
+    expect(listPhotosMock).toHaveBeenCalledWith(1, 20);
     expect(
       screen.getByRole("img", { name: "A server-rendered mountain lake" }),
     ).toBeInTheDocument();
@@ -69,29 +52,33 @@ describe("PhotoFeed", () => {
 
   it("returns an empty state when Unsplash has no photos", async () => {
     listPhotosMock.mockResolvedValue({ ...response, items: [], total: 0 });
-
-    render(await PhotoFeed({ query: "" }));
+    render(await PhotoFeed({ page: 1 }));
 
     expect(screen.getByRole("status")).toHaveTextContent("No photos yet");
   });
 
-  it("renders async search results instead of the default feed", async () => {
-    searchPhotosMock.mockResolvedValue(response);
+  it("requests the page selected in the URL", async () => {
+    listPhotosMock.mockResolvedValue({
+      ...response,
+      page: 3,
+      total: 60,
+      totalPages: 3,
+    });
+    render(await PhotoFeed({ page: 3 }));
 
-    render(await PhotoFeed({ query: "forest" }));
-
-    expect(searchPhotosMock).toHaveBeenCalledWith("forest");
-    expect(listPhotosMock).not.toHaveBeenCalled();
-    expect(
-      screen.getByRole("heading", { name: "Results for “forest”" }),
-    ).toBeInTheDocument();
+    expect(listPhotosMock).toHaveBeenCalledWith(3, 20);
   });
 
-  it("renders a specific empty state for a search without results", async () => {
-    searchPhotosMock.mockResolvedValue({ ...response, items: [], total: 0 });
+  it("redirects an out-of-range page to the last available page", async () => {
+    listPhotosMock.mockResolvedValue({
+      ...response,
+      items: [],
+      page: 5,
+      total: 40,
+      totalPages: 2,
+    });
 
-    render(await PhotoFeed({ query: "nothing" }));
-
-    expect(screen.getByRole("status")).toHaveTextContent("No photos found");
+    await expect(PhotoFeed({ page: 5 })).rejects.toThrow("NEXT_REDIRECT");
+    expect(redirectMock).toHaveBeenCalledWith("/?page=2");
   });
 });

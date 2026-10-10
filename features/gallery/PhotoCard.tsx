@@ -13,7 +13,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import type { PhotoSummary } from "@/lib/unsplash/types";
+import type { GalleryPhoto } from "@/domain/photo/types";
 import type { GalleryDensity } from "./types";
 import styles from "./PhotoCard.module.scss";
 
@@ -33,8 +33,9 @@ function getAttributionUrl(url: string): string {
 }
 
 type PhotoCardProps = Readonly<{
-  photo: PhotoSummary;
+  photo: GalleryPhoto;
   density: GalleryDensity;
+  eager?: boolean;
 }>;
 
 const imageSizes: Record<GalleryDensity, string> = {
@@ -42,7 +43,7 @@ const imageSizes: Record<GalleryDensity, string> = {
   compact: "(max-width: 767px) 50vw, (max-width: 1023px) 33vw, 20vw",
 };
 
-export function PhotoCard({ photo, density }: PhotoCardProps) {
+export function PhotoCard({ photo, density, eager = false }: PhotoCardProps) {
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const detailsUrl = `/photos/${encodeURIComponent(photo.id)}`;
 
@@ -70,6 +71,7 @@ export function PhotoCard({ photo, density }: PhotoCardProps) {
           alt={photo.altDescription}
           width={photo.width}
           height={photo.height}
+          loading={eager ? "eager" : "lazy"}
           sizes={imageSizes[density]}
           style={{ backgroundColor: photo.color ?? undefined }}
           onLoad={() => setIsImageLoaded(true)}

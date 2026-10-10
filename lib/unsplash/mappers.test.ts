@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { mapPhotoDetails, mapPhotoSummary } from "./mappers";
+import { mapGalleryPhoto, mapPhotoDetails, mapPhotoSummary } from "./mappers";
 import type { UnsplashApiPhoto } from "./types";
 
 const apiPhoto: UnsplashApiPhoto = {
@@ -69,6 +69,25 @@ describe("mapPhotoSummary", () => {
     expect(mapPhotoSummary(photoWithoutText).altDescription).toBe(
       "Photo by Ada Example",
     );
+  });
+});
+
+describe("mapGalleryPhoto", () => {
+  it("keeps only fields used by gallery cards", () => {
+    expect(mapGalleryPhoto(apiPhoto)).toEqual({
+      id: "photo-1",
+      width: 2400,
+      height: 1600,
+      color: "#aabbcc",
+      altDescription: "A lake surrounded by mountains",
+      urls: { regular: "https://images.unsplash.com/regular" },
+      unsplashUrl: "https://unsplash.com/photos/photo-1",
+      author: {
+        name: "Ada Example",
+        profileImageUrl: "https://images.unsplash.com/profile-medium",
+        profileUrl: "https://unsplash.com/@ada",
+      },
+    });
   });
 });
 

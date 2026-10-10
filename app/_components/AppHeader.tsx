@@ -1,11 +1,8 @@
-"use client";
-
-import PhotoLibraryRounded from "@mui/icons-material/PhotoLibraryRounded";
-import { AppBar, Button, Toolbar } from "@mui/material";
-import Link from "next/link";
+import { AppBar, Toolbar } from "@mui/material";
 import { Suspense } from "react";
+import { PageContainer } from "@/components/layout/PageContainer";
 import { SearchForm } from "@/features/search/SearchForm";
-import { PageContainer } from "./PageContainer";
+import { AppHeaderBrand } from "./AppHeaderBrand";
 import styles from "./AppHeader.module.scss";
 
 type AppHeaderProps = Readonly<{
@@ -23,16 +20,7 @@ export function AppHeader({ initialQuery = "" }: AppHeaderProps) {
     >
       <PageContainer>
         <Toolbar disableGutters className={styles.toolbar}>
-          <Button
-            component={Link}
-            className={styles.brand}
-            href="/"
-            aria-label="Photo Gallery home"
-            color="inherit"
-            startIcon={<PhotoLibraryRounded aria-hidden="true" />}
-          >
-            Photo Gallery
-          </Button>
+          <AppHeaderBrand />
           <div className={styles.search}>
             <Suspense fallback={null}>
               <SearchForm initialQuery={initialQuery} />

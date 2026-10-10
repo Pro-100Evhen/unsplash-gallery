@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import type { PhotoSummary } from "@/lib/unsplash/types";
 import { Gallery } from "./Gallery";
+import styles from "./Gallery.module.scss";
 
 const photoFixture: PhotoSummary = {
   id: "photo-one",
@@ -39,7 +40,7 @@ describe("Gallery", () => {
       },
     ];
 
-    render(<Gallery photos={photos} />);
+    render(<Gallery photos={photos} density="comfortable" />);
 
     expect(screen.getAllByRole("listitem")).toHaveLength(2);
     expect(
@@ -50,8 +51,19 @@ describe("Gallery", () => {
     );
   });
 
+  it.each(["comfortable", "compact"] as const)(
+    "maps the %s density to a dedicated layout class",
+    (density) => {
+      render(<Gallery photos={[photoFixture]} density={density} />);
+
+      expect(screen.getByRole("list", { name: "Photo gallery" })).toHaveClass(
+        styles[density],
+      );
+    },
+  );
+
   it("does not render a layout wrapper for an empty list", () => {
-    const { container } = render(<Gallery photos={[]} />);
+    const { container } = render(<Gallery photos={[]} density="comfortable" />);
 
     expect(container).toBeEmptyDOMElement();
   });

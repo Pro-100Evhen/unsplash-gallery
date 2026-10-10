@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { PhotoSummary } from "@/lib/unsplash/types";
+import type { GalleryDensity } from "./types";
 import styles from "./PhotoCard.module.scss";
 
 const ATTRIBUTION_PARAMS = {
@@ -20,9 +21,15 @@ function getAttributionUrl(url: string): string {
 
 type PhotoCardProps = Readonly<{
   photo: PhotoSummary;
+  density: GalleryDensity;
 }>;
 
-export function PhotoCard({ photo }: PhotoCardProps) {
+const imageSizes: Record<GalleryDensity, string> = {
+  comfortable: "(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 33vw",
+  compact: "(max-width: 767px) 50vw, (max-width: 1023px) 33vw, 20vw",
+};
+
+export function PhotoCard({ photo, density }: PhotoCardProps) {
   const detailsUrl = `/photos/${encodeURIComponent(photo.id)}`;
 
   return (
@@ -38,7 +45,7 @@ export function PhotoCard({ photo }: PhotoCardProps) {
           alt={photo.altDescription}
           width={photo.width}
           height={photo.height}
-          sizes="(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 33vw"
+          sizes={imageSizes[density]}
           style={{ backgroundColor: photo.color ?? undefined }}
         />
       </Link>

@@ -30,7 +30,7 @@ const photoFixture: PhotoSummary = {
 
 describe("PhotoCard", () => {
   it("links the image to the encoded photo details route without nesting attribution links", () => {
-    render(<PhotoCard photo={photoFixture} />);
+    render(<PhotoCard photo={photoFixture} density="comfortable" />);
 
     const detailsLink = screen.getByRole("link", {
       name: `View ${photoFixture.altDescription}`,
@@ -44,6 +44,7 @@ describe("PhotoCard", () => {
     render(
       <PhotoCard
         photo={{ ...photoFixture, altDescription: "Photo by Ada Example" }}
+        density="comfortable"
       />,
     );
 
@@ -55,7 +56,7 @@ describe("PhotoCard", () => {
   });
 
   it("adds Unsplash attribution parameters to external links", () => {
-    render(<PhotoCard photo={photoFixture} />);
+    render(<PhotoCard photo={photoFixture} density="comfortable" />);
 
     for (const name of ["Ada Example", "Unsplash"]) {
       const link = screen.getByRole("link", { name });
@@ -65,4 +66,16 @@ describe("PhotoCard", () => {
       expect(url.searchParams.get("utm_medium")).toBe("referral");
     }
   });
+
+  it.each([
+    ["comfortable", "(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 33vw"],
+    ["compact", "(max-width: 767px) 50vw, (max-width: 1023px) 33vw, 20vw"],
+  ] as const)(
+    "uses responsive image sizes for %s density",
+    (density, sizes) => {
+      render(<PhotoCard photo={photoFixture} density={density} />);
+
+      expect(screen.getByRole("img")).toHaveAttribute("sizes", sizes);
+    },
+  );
 });

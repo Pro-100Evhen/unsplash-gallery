@@ -2,16 +2,34 @@
 @use "../../styles/tokens" as tokens;
 
 .gallery {
-  column-count: 1;
   column-gap: tokens.$space-4;
 
   @include mixins.from(tokens.$breakpoint-tablet) {
-    column-count: 2;
     column-gap: tokens.$space-6;
+  }
+}
+
+.comfortable {
+  column-count: 1;
+
+  @include mixins.from(tokens.$breakpoint-tablet) {
+    column-count: 2;
   }
 
   @include mixins.from(tokens.$breakpoint-desktop) {
     column-count: 3;
+  }
+}
+
+.compact {
+  column-count: 2;
+
+  @include mixins.from(tokens.$breakpoint-tablet) {
+    column-count: 3;
+  }
+
+  @include mixins.from(tokens.$breakpoint-desktop) {
+    column-count: 5;
   }
 }
 

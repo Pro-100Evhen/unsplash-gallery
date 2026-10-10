@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import { EmptyState } from "@/components/feedback/EmptyState";
 import { GallerySkeleton } from "@/components/feedback/GallerySkeleton";
 import { PageContainer } from "@/components/layout/PageContainer";
-import { Gallery } from "@/features/gallery/Gallery";
+import { GalleryView } from "@/features/gallery/GalleryView";
 import { listPhotos } from "@/lib/unsplash/client";
 import styles from "./page.module.scss";
 
@@ -21,7 +21,7 @@ export async function PhotoFeed() {
     );
   }
 
-  return <Gallery photos={items} />;
+  return <GalleryView photos={items} />;
 }
 
 export default function Home() {

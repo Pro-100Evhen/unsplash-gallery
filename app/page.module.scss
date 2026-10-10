@@ -1,0 +1,12 @@
+@use "../styles/tokens" as tokens;
+
+.main {
+  padding-block: tokens.$space-8 tokens.$space-12;
+}
+
+.heading {
+  margin: 0 0 tokens.$space-8;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  line-height: 1;
+  letter-spacing: -0.04em;
+}

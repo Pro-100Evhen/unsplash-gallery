@@ -1,0 +1,25 @@
+@use "../../styles/mixins" as mixins;
+@use "../../styles/tokens" as tokens;
+
+.gallery {
+  column-count: 1;
+  column-gap: tokens.$space-4;
+
+  @include mixins.from(tokens.$breakpoint-tablet) {
+    column-count: 2;
+    column-gap: tokens.$space-6;
+  }
+
+  @include mixins.from(tokens.$breakpoint-desktop) {
+    column-count: 3;
+  }
+}
+
+.item {
+  margin-block-end: tokens.$space-4;
+  break-inside: avoid;
+
+  @include mixins.from(tokens.$breakpoint-tablet) {
+    margin-block-end: tokens.$space-6;
+  }
+}

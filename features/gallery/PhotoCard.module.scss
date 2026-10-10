@@ -1,0 +1,43 @@
+@use "../../styles/tokens" as tokens;
+
+.card {
+  overflow: hidden;
+  background: #fff;
+  border-radius: 8px;
+}
+
+.imageLink {
+  display: block;
+  overflow: hidden;
+  color: inherit;
+}
+
+.image {
+  display: block;
+  width: 100%;
+  height: auto;
+  transition: transform 200ms ease;
+}
+
+.imageLink:hover .image {
+  transform: scale(1.01);
+}
+
+.imageLink:focus-visible {
+  outline: 3px solid currentColor;
+  outline-offset: 3px;
+}
+
+.attribution {
+  margin: 0;
+  padding: tokens.$space-3 tokens.$space-4;
+  color: #5e5e5e;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.attribution a {
+  color: #2f2f2f;
+  font-weight: 600;
+  text-underline-offset: 2px;
+}

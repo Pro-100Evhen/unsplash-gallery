@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import type { PhotoSummary } from "@/lib/unsplash/types";
 import { PhotoCard } from "./PhotoCard";
@@ -53,6 +53,29 @@ describe("PhotoCard", () => {
     expect(image).toHaveAttribute("width", "2400");
     expect(image).toHaveAttribute("height", "1600");
     expect(image).toHaveStyle({ backgroundColor: "#aabbcc" });
+  });
+
+  it("shows a MUI skeleton until the photo finishes loading", async () => {
+    render(<PhotoCard photo={photoFixture} density="comfortable" />);
+
+    const image = screen.getByRole("img", {
+      name: photoFixture.altDescription,
+    });
+    const imageLink = screen.getByRole("link", {
+      name: `View ${photoFixture.altDescription}`,
+    });
+
+    expect(screen.getByTestId("photo-loading-skeleton")).toBeVisible();
+    expect(imageLink).toHaveAttribute("aria-busy", "true");
+
+    fireEvent.load(image);
+
+    await waitFor(() => {
+      expect(
+        screen.queryByTestId("photo-loading-skeleton"),
+      ).not.toBeInTheDocument();
+    });
+    expect(imageLink).toHaveAttribute("aria-busy", "false");
   });
 
   it("adds Unsplash attribution parameters to external links", () => {

@@ -2,8 +2,9 @@ import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { PaginatedPhotos } from "@/lib/unsplash/types";
 
-const { listPhotosMock } = vi.hoisted(() => ({
+const { listPhotosMock, searchPhotosMock } = vi.hoisted(() => ({
   listPhotosMock: vi.fn(),
+  searchPhotosMock: vi.fn(),
 }));
 
 vi.mock("next/cache", () => ({
@@ -12,6 +13,7 @@ vi.mock("next/cache", () => ({
 
 vi.mock("@/lib/unsplash/client", () => ({
   listPhotos: listPhotosMock,
+  searchPhotos: searchPhotosMock,
 }));
 
 import { PhotoFeed } from "./page";
@@ -52,12 +54,13 @@ const response: PaginatedPhotos = {
 describe("PhotoFeed", () => {
   beforeEach(() => {
     listPhotosMock.mockReset();
+    searchPhotosMock.mockReset();
   });
 
   it("returns photo content from the server data request", async () => {
     listPhotosMock.mockResolvedValue(response);
 
-    render(await PhotoFeed());
+    render(await PhotoFeed({ query: "" }));
 
     expect(
       screen.getByRole("img", { name: "A server-rendered mountain lake" }),
@@ -67,8 +70,28 @@ describe("PhotoFeed", () => {
   it("returns an empty state when Unsplash has no photos", async () => {
     listPhotosMock.mockResolvedValue({ ...response, items: [], total: 0 });
 
-    render(await PhotoFeed());
+    render(await PhotoFeed({ query: "" }));
 
     expect(screen.getByRole("status")).toHaveTextContent("No photos yet");
+  });
+
+  it("renders async search results instead of the default feed", async () => {
+    searchPhotosMock.mockResolvedValue(response);
+
+    render(await PhotoFeed({ query: "forest" }));
+
+    expect(searchPhotosMock).toHaveBeenCalledWith("forest");
+    expect(listPhotosMock).not.toHaveBeenCalled();
+    expect(
+      screen.getByRole("heading", { name: "Results for “forest”" }),
+    ).toBeInTheDocument();
+  });
+
+  it("renders a specific empty state for a search without results", async () => {
+    searchPhotosMock.mockResolvedValue({ ...response, items: [], total: 0 });
+
+    render(await PhotoFeed({ query: "nothing" }));
+
+    expect(screen.getByRole("status")).toHaveTextContent("No photos found");
   });
 });

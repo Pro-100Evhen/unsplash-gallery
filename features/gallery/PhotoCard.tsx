@@ -1,5 +1,18 @@
+"use client";
+
+import {
+  Avatar,
+  Box,
+  Card,
+  CardActionArea,
+  Link as MuiLink,
+  Skeleton,
+  Stack,
+  Typography,
+} from "@mui/material";
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 import type { PhotoSummary } from "@/lib/unsplash/types";
 import type { GalleryDensity } from "./types";
 import styles from "./PhotoCard.module.scss";
@@ -30,44 +43,78 @@ const imageSizes: Record<GalleryDensity, string> = {
 };
 
 export function PhotoCard({ photo, density }: PhotoCardProps) {
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
   const detailsUrl = `/photos/${encodeURIComponent(photo.id)}`;
 
   return (
-    <article className={styles.card}>
-      <Link
+    <Card component="article" elevation={0} className={styles.card}>
+      <CardActionArea
+        component={Link}
         className={styles.imageLink}
         href={detailsUrl}
         aria-label={`View ${photo.altDescription}`}
+        aria-busy={!isImageLoaded}
       >
+        {!isImageLoaded ? (
+          <Skeleton
+            className={styles.imageSkeleton}
+            variant="rectangular"
+            animation="wave"
+            data-testid="photo-loading-skeleton"
+            aria-hidden="true"
+          />
+        ) : null}
         <Image
-          className={styles.image}
+          className={`${styles.image} ${isImageLoaded ? styles.imageLoaded : ""}`}
           src={photo.urls.regular}
           alt={photo.altDescription}
           width={photo.width}
           height={photo.height}
           sizes={imageSizes[density]}
           style={{ backgroundColor: photo.color ?? undefined }}
+          onLoad={() => setIsImageLoaded(true)}
+          onError={() => setIsImageLoaded(true)}
         />
-      </Link>
+      </CardActionArea>
 
-      <p className={styles.attribution}>
-        Photo by{" "}
-        <a
-          href={getAttributionUrl(photo.author.profileUrl)}
-          target="_blank"
-          rel="noreferrer"
+      <Box className={styles.attribution}>
+        <Stack
+          direction="row"
+          sx={{ alignItems: "center", gap: 1, minWidth: 0 }}
         >
-          {photo.author.name}
-        </a>{" "}
-        on{" "}
-        <a
-          href={getAttributionUrl(photo.unsplashUrl)}
-          target="_blank"
-          rel="noreferrer"
-        >
-          Unsplash
-        </a>
-      </p>
-    </article>
+          <Avatar
+            className={styles.avatar}
+            src={photo.author.profileImageUrl}
+            alt=""
+            aria-hidden="true"
+          />
+          <Box sx={{ minWidth: 0 }}>
+            <Typography variant="body2" component="div" noWrap>
+              <MuiLink
+                className={styles.attributionLink}
+                href={getAttributionUrl(photo.author.profileUrl)}
+                target="_blank"
+                rel="noreferrer"
+                underline="hover"
+              >
+                {photo.author.name}
+              </MuiLink>
+            </Typography>
+            <Typography variant="caption" component="div">
+              on{" "}
+              <MuiLink
+                className={styles.attributionLink}
+                href={getAttributionUrl(photo.unsplashUrl)}
+                target="_blank"
+                rel="noreferrer"
+                underline="hover"
+              >
+                Unsplash
+              </MuiLink>
+            </Typography>
+          </Box>
+        </Stack>
+      </Box>
+    </Card>
   );
 }

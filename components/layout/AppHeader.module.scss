@@ -1,0 +1,39 @@
+@use "../../styles/mixins" as mixins;
+@use "../../styles/tokens" as tokens;
+
+.header {
+  border-bottom: 1px solid rgb(17 17 17 / 8%);
+  background: rgb(255 255 255 / 92%);
+  backdrop-filter: blur(16px);
+}
+
+.toolbar {
+  display: grid;
+  gap: tokens.$space-2;
+  padding-block: tokens.$space-3;
+
+  @include mixins.from(tokens.$breakpoint-tablet) {
+    grid-template-columns: auto minmax(320px, 640px);
+    align-items: center;
+    justify-content: space-between;
+    gap: tokens.$space-6;
+  }
+}
+
+.brand {
+  justify-self: start;
+  min-width: 0;
+  padding-inline: 0;
+  font-size: 1rem;
+  white-space: nowrap;
+}
+
+.brand:hover {
+  background: transparent;
+  opacity: 0.68;
+}
+
+.search {
+  width: 100%;
+  min-width: 0;
+}

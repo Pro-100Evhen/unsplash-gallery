@@ -9,11 +9,17 @@ export function ProfileIdentity() {
   const dispatch = useAppDispatch();
   const user = useAppSelector(selectDemoUser);
 
+  const logout = () => {
+    dispatch(logoutDemoUser());
+  };
+
   if (!user) {
     return (
       <Paper variant="outlined" sx={{ p: 3, mb: 4 }}>
         <Stack spacing={2} sx={{ alignItems: "flex-start" }}>
-          <Typography variant="h6">Demo profile</Typography>
+          <Typography component="h2" variant="h6">
+            Demo profile
+          </Typography>
           <Typography color="text.secondary">
             Create an optional local profile. Your photo collection works
             without one.
@@ -36,7 +42,12 @@ export function ProfileIdentity() {
           {user.name}
         </Typography>
         <Typography color="text.secondary">{user.email}</Typography>
-        <Button variant="outlined" onClick={() => dispatch(logoutDemoUser())}>
+        <Button
+          component={Link}
+          href="/register"
+          variant="outlined"
+          onClick={logout}
+        >
           Log out
         </Button>
       </Stack>

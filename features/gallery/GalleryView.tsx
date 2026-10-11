@@ -1,6 +1,7 @@
 "use client";
 
 import { Stack, Typography } from "@mui/material";
+import type { ReactNode } from "react";
 import type { GalleryPhoto } from "@/domain/photo/types";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { Gallery } from "./Gallery";
@@ -13,6 +14,7 @@ type GalleryViewProps = Readonly<{
   title?: string;
   page?: number;
   totalPages?: number | null;
+  children?: ReactNode;
 }>;
 
 export function GalleryView({
@@ -20,6 +22,7 @@ export function GalleryView({
   title = "Discover Photos",
   page = 1,
   totalPages = null,
+  children,
 }: GalleryViewProps) {
   const dispatch = useAppDispatch();
   const density = useAppSelector(selectDensity);
@@ -52,6 +55,7 @@ export function GalleryView({
           onDensityChange={(nextDensity) => dispatch(setDensity(nextDensity))}
         />
       </Stack>
+      {children}
       <Gallery photos={photos} density={density} />
       {totalPages !== null && totalPages > 1 ? (
         <GalleryPagination page={page} totalPages={totalPages} />

@@ -7,6 +7,11 @@
   display: block;
 }
 
+.field :global(input::placeholder) {
+  color: var(--mui-palette-text-secondary);
+  opacity: 1;
+}
+
 .loader {
   position: absolute;
   right: 1rem;

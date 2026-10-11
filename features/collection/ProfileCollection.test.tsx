@@ -1,16 +1,24 @@
 import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { makeStore } from "@/store";
 import { galleryPhotoFixture } from "@/test/fixtures/photos";
 import { renderWithStore } from "@/test/renderWithStore";
 import { savePhoto } from "./collectionSlice";
 import { ProfileCollection } from "./ProfileCollection";
 
+vi.mock("next/link", () => ({ default: "a" }));
+
 describe("ProfileCollection", () => {
   it("shows an empty state with a gallery CTA", () => {
     renderWithStore(<ProfileCollection />);
 
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
+      "My collection",
+    );
+    expect(
+      screen.getByRole("heading", { level: 2, name: "Demo profile" }),
+    ).toBeVisible();
     expect(screen.getByRole("status")).toHaveTextContent(
       "Your collection is empty",
     );
@@ -26,6 +34,11 @@ describe("ProfileCollection", () => {
 
     renderWithStore(<ProfileCollection />, { store });
 
+    const headings = screen.getAllByRole("heading");
+    expect(headings[0]).toHaveTextContent("My collection");
+    expect(headings[0].tagName).toBe("H1");
+    expect(headings[1]).toHaveTextContent("Demo profile");
+    expect(headings[1].tagName).toBe("H2");
     expect(
       screen.getByRole("img", { name: galleryPhotoFixture.altDescription }),
     ).toBeVisible();

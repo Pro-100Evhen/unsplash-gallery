@@ -31,9 +31,8 @@ export function ProfileCollection() {
   }
 
   return (
-    <>
+    <GalleryView photos={photos} title="My collection">
       <ProfileIdentity />
-      <GalleryView photos={photos} title="My collection" />
-    </>
+    </GalleryView>
   );
 }

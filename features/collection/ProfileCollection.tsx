@@ -13,7 +13,7 @@ export function ProfileCollection() {
   if (photos.length === 0) {
     return (
       <>
-        <Typography component="h1" variant="h2">
+        <Typography component="h1" variant="h2" sx={{ mb: { xs: 3, md: 4 } }}>
           My collection
         </Typography>
         <ProfileIdentity />

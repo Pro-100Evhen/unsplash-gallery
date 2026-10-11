@@ -46,8 +46,8 @@ describe("Gallery", () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it("loads only the likely LCP image eagerly", () => {
-    const photos = Array.from({ length: 5 }, (_, index) => ({
+  it("eagerly loads the masonry photos that can appear above the fold", () => {
+    const photos = Array.from({ length: 12 }, (_, index) => ({
       ...galleryPhotoFixture,
       id: `photo-${index}`,
       altDescription: `Photo ${index}`,
@@ -56,9 +56,11 @@ describe("Gallery", () => {
     renderWithStore(<Gallery photos={photos} density="comfortable" />);
 
     const images = screen.getAllByRole("img");
-    expect(images[0]).toHaveAttribute("loading", "eager");
     images
-      .slice(1)
+      .slice(0, 10)
+      .forEach((image) => expect(image).toHaveAttribute("loading", "eager"));
+    images
+      .slice(10)
       .forEach((image) => expect(image).toHaveAttribute("loading", "lazy"));
   });
 });

@@ -74,6 +74,23 @@ npm run build
 npm run start
 ```
 
+## Deployment
+
+Vercel is the recommended target because it provides verified support for the
+Next.js features used by this project. Before deploying:
+
+1. Push the repository to GitHub and connect it to a new Vercel project.
+2. Add `UNSPLASH_ACCESS_KEY` to the Vercel Production environment. Do not add
+   the Unsplash secret key or expose the access key through a `NEXT_PUBLIC_*`
+   variable.
+3. If a credential has been shared outside the hosting environment, rotate it
+   in the Unsplash developer dashboard before using it in production.
+4. Deploy, then smoke-test the routes listed below and confirm the production
+   browser console and network panel are clean.
+
+No additional build configuration is required: Vercel can use the existing
+`npm run build` command and Next.js output.
+
 ## Commands
 
 | Command                 | Purpose                                  |

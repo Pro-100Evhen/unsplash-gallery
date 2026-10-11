@@ -13,7 +13,9 @@ const densityClassNames: Record<GalleryDensity, string> = {
   compact: styles.compact,
 };
 
-const EAGER_IMAGE_COUNT = 1;
+// CSS columns balance items vertically, so several early DOM items can become
+// above-the-fold candidates across the responsive 3/5-column layouts.
+const EAGER_MASONRY_IMAGE_COUNT = 10;
 
 export function Gallery({ photos, density }: GalleryProps) {
   if (photos.length === 0) {
@@ -31,7 +33,7 @@ export function Gallery({ photos, density }: GalleryProps) {
           <PhotoCard
             photo={photo}
             density={density}
-            eager={index < EAGER_IMAGE_COUNT}
+            eager={index < EAGER_MASONRY_IMAGE_COUNT}
           />
         </div>
       ))}

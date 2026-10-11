@@ -140,6 +140,17 @@ describe("Unsplash client", () => {
     expect(cacheLife).not.toHaveBeenCalled();
   });
 
+  it("rejects malformed API payloads at the transport boundary", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(mockResponse([{ id: "incomplete-photo" }])),
+    );
+
+    await expect(listPhotos()).rejects.toMatchObject({
+      category: "invalid-response",
+    });
+  });
+
   it.each([
     [401, "unauthorized"],
     [403, "rate-limit"],

@@ -15,23 +15,9 @@ import Link from "next/link";
 import { useState } from "react";
 import type { GalleryPhoto } from "@/domain/photo/types";
 import { SavePhotoButton } from "@/features/collection/SavePhotoButton";
+import { getUnsplashAttributionUrl } from "@/lib/unsplash/attribution";
 import type { GalleryDensity } from "./types";
 import styles from "./PhotoCard.module.scss";
-
-const ATTRIBUTION_PARAMS = {
-  utm_source: "arounda_photo_gallery",
-  utm_medium: "referral",
-};
-
-function getAttributionUrl(url: string): string {
-  const attributionUrl = new URL(url);
-
-  Object.entries(ATTRIBUTION_PARAMS).forEach(([name, value]) => {
-    attributionUrl.searchParams.set(name, value);
-  });
-
-  return attributionUrl.toString();
-}
 
 type PhotoCardProps = Readonly<{
   photo: GalleryPhoto;
@@ -98,7 +84,7 @@ export function PhotoCard({ photo, density, eager = false }: PhotoCardProps) {
             <Typography variant="body2" component="div" noWrap>
               <MuiLink
                 className={styles.attributionLink}
-                href={getAttributionUrl(photo.author.profileUrl)}
+                href={getUnsplashAttributionUrl(photo.author.profileUrl)}
                 target="_blank"
                 rel="noreferrer"
                 underline="hover"
@@ -110,7 +96,7 @@ export function PhotoCard({ photo, density, eager = false }: PhotoCardProps) {
               on{" "}
               <MuiLink
                 className={styles.attributionLink}
-                href={getAttributionUrl(photo.unsplashUrl)}
+                href={getUnsplashAttributionUrl(photo.unsplashUrl)}
                 target="_blank"
                 rel="noreferrer"
                 underline="hover"

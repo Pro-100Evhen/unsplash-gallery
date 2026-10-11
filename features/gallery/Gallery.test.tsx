@@ -45,4 +45,20 @@ describe("Gallery", () => {
 
     expect(container).toBeEmptyDOMElement();
   });
+
+  it("loads only the likely LCP image eagerly", () => {
+    const photos = Array.from({ length: 5 }, (_, index) => ({
+      ...galleryPhotoFixture,
+      id: `photo-${index}`,
+      altDescription: `Photo ${index}`,
+    }));
+
+    renderWithStore(<Gallery photos={photos} density="comfortable" />);
+
+    const images = screen.getAllByRole("img");
+    expect(images[0]).toHaveAttribute("loading", "eager");
+    images
+      .slice(1)
+      .forEach((image) => expect(image).toHaveAttribute("loading", "lazy"));
+  });
 });

@@ -1,5 +1,12 @@
+import { ZodError } from "zod";
+
 export type UnsplashErrorCategory =
-  "unauthorized" | "rate-limit" | "not-found" | "network" | "unknown";
+  | "unauthorized"
+  | "rate-limit"
+  | "not-found"
+  | "network"
+  | "invalid-response"
+  | "unknown";
 
 interface UnsplashApiErrorOptions {
   category: UnsplashErrorCategory;
@@ -58,6 +65,13 @@ export function normalizeUnsplashError(error: unknown): UnsplashApiError {
   if (error instanceof TypeError) {
     return new UnsplashApiError("Unable to reach Unsplash.", {
       category: "network",
+      cause: error,
+    });
+  }
+
+  if (error instanceof ZodError) {
+    return new UnsplashApiError("Unsplash returned an invalid response.", {
+      category: "invalid-response",
       cause: error,
     });
   }

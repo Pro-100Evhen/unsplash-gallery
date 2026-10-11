@@ -1,6 +1,7 @@
 import "server-only";
 
 import { cacheLife } from "next/cache";
+import { z } from "zod";
 import type { PaginatedPhotos, PhotoDetails } from "@/domain/photo/types";
 import {
   UnsplashApiError,
@@ -8,7 +9,11 @@ import {
   normalizeUnsplashError,
 } from "./errors";
 import { mapGalleryPhoto, mapPhotoDetails } from "./mappers";
-import type { UnsplashApiPhoto, UnsplashApiSearchResponse } from "./types";
+import {
+  unsplashApiPhotoDetailsSchema,
+  unsplashApiPhotoSchema,
+  unsplashApiSearchResponseSchema,
+} from "./types";
 
 const UNSPLASH_API_URL = "https://api.unsplash.com/";
 const DEFAULT_PER_PAGE = 20;
@@ -32,6 +37,7 @@ function getAccessKey(): string {
 
 async function requestUnsplash<T>(
   path: string,
+  schema: z.ZodType<T>,
   searchParams?: URLSearchParams,
 ): Promise<UnsplashResponse<T>> {
   const accessKey = getAccessKey();
@@ -52,8 +58,10 @@ async function requestUnsplash<T>(
       throw createUnsplashHttpError(response.status);
     }
 
+    const payload: unknown = await response.json();
+
     return {
-      data: (await response.json()) as T,
+      data: schema.parse(payload),
       headers: response.headers,
     };
   } catch (error) {
@@ -82,8 +90,9 @@ export async function listPhotos(
     page: String(page),
     per_page: String(perPage),
   });
-  const response = await requestUnsplash<UnsplashApiPhoto[]>(
+  const response = await requestUnsplash(
     "photos",
+    z.array(unsplashApiPhotoSchema),
     searchParams,
   );
   const total = parseTotal(response.headers.get("x-total"));
@@ -110,8 +119,9 @@ export async function searchPhotos(
     page: String(page),
     per_page: String(perPage),
   });
-  const response = await requestUnsplash<UnsplashApiSearchResponse>(
+  const response = await requestUnsplash(
     "search/photos",
+    unsplashApiSearchResponseSchema,
     searchParams,
   );
 
@@ -125,8 +135,9 @@ export async function searchPhotos(
 }
 
 export async function getPhoto(id: string): Promise<PhotoDetails> {
-  const response = await requestUnsplash<UnsplashApiPhoto>(
+  const response = await requestUnsplash(
     `photos/${encodeURIComponent(id)}`,
+    unsplashApiPhotoDetailsSchema,
   );
 
   return mapPhotoDetails(response.data);

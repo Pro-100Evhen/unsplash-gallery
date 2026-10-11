@@ -6,11 +6,8 @@ import { hydrateCollection } from "@/features/collection/collectionSlice";
 import { setDensity } from "@/features/gallery/preferencesSlice";
 import { registerDemoUser } from "@/features/auth/authSlice";
 import { makeStore, type AppStore } from "./index";
-import {
-  PERSISTENCE_VERSION,
-  readPersistedState,
-  writePersistedState,
-} from "./persistence";
+import { readPersistedState } from "./persistence";
+import { subscribeToStorePersistence } from "./persistStore";
 
 type StoreProviderProps = Readonly<{
   children: ReactNode;
@@ -35,16 +32,7 @@ export function StoreProvider({ children, store }: StoreProviderProps) {
       appStore.dispatch(setDensity(persistedState.preferences.density));
     }
 
-    return appStore.subscribe(() => {
-      const state = appStore.getState();
-
-      writePersistedState(window.localStorage, {
-        version: PERSISTENCE_VERSION,
-        auth: state.auth,
-        collection: state.collection,
-        preferences: state.preferences,
-      });
-    });
+    return subscribeToStorePersistence(appStore, window.localStorage);
   }, [appStore]);
 
   return (

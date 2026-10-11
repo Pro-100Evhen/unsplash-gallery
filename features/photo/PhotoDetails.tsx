@@ -13,12 +13,8 @@ import Image from "next/image";
 import Link from "next/link";
 import type { PhotoDetails as PhotoDetailsDto } from "@/domain/photo/types";
 import { SavePhotoButton } from "@/features/collection/SavePhotoButton";
+import { getUnsplashAttributionUrl } from "@/lib/unsplash/attribution";
 import styles from "./PhotoDetails.module.scss";
-
-const ATTRIBUTION_PARAMS = {
-  utm_source: "arounda_photo_gallery",
-  utm_medium: "referral",
-};
 
 const photoDateFormatter = new Intl.DateTimeFormat("en-US", {
   day: "numeric",
@@ -26,16 +22,6 @@ const photoDateFormatter = new Intl.DateTimeFormat("en-US", {
   timeZone: "UTC",
   year: "numeric",
 });
-
-function getAttributionUrl(url: string): string {
-  const attributionUrl = new URL(url);
-
-  Object.entries(ATTRIBUTION_PARAMS).forEach(([name, value]) => {
-    attributionUrl.searchParams.set(name, value);
-  });
-
-  return attributionUrl.toString();
-}
 
 function getLocationLabel(photo: PhotoDetailsDto): string | null {
   if (!photo.location) {
@@ -95,7 +81,7 @@ export function PhotoDetails({ photo }: PhotoDetailsProps) {
             </Typography>
             <Typography variant="body2" color="text.secondary">
               <MuiLink
-                href={getAttributionUrl(photo.author.profileUrl)}
+                href={getUnsplashAttributionUrl(photo.author.profileUrl)}
                 target="_blank"
                 rel="noreferrer"
                 underline="hover"
@@ -104,7 +90,7 @@ export function PhotoDetails({ photo }: PhotoDetailsProps) {
               </MuiLink>{" "}
               on{" "}
               <MuiLink
-                href={getAttributionUrl(photo.unsplashUrl)}
+                href={getUnsplashAttributionUrl(photo.unsplashUrl)}
                 target="_blank"
                 rel="noreferrer"
                 underline="hover"

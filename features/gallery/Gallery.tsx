@@ -13,7 +13,7 @@ const densityClassNames: Record<GalleryDensity, string> = {
   compact: styles.compact,
 };
 
-const EAGER_IMAGE_COUNT = 5;
+const EAGER_IMAGE_COUNT = 1;
 
 export function Gallery({ photos, density }: GalleryProps) {
   if (photos.length === 0) {

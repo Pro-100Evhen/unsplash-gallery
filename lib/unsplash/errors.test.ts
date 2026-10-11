@@ -36,6 +36,15 @@ describe("normalizeUnsplashError", () => {
     expect(error.cause).toBe(cause);
   });
 
+  it("maps aborted requests to the timeout category", () => {
+    const cause = new DOMException("The operation timed out", "TimeoutError");
+    const error = normalizeUnsplashError(cause);
+
+    expect(error.category).toBe("timeout");
+    expect(error.status).toBeNull();
+    expect(error.cause).toBe(cause);
+  });
+
   it("maps unexpected values to the unknown category", () => {
     const error = normalizeUnsplashError("unexpected failure");
 

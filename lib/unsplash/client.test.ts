@@ -74,6 +74,7 @@ describe("Unsplash client", () => {
       "https://api.unsplash.com/photos?page=2&per_page=10",
       {
         headers: { Authorization: "Client-ID test-access-key" },
+        signal: expect.any(AbortSignal),
       },
     );
     expect(result).toMatchObject({
@@ -101,6 +102,7 @@ describe("Unsplash client", () => {
       "https://api.unsplash.com/search/photos?query=green+forest&page=3&per_page=12",
       {
         headers: { Authorization: "Client-ID test-access-key" },
+        signal: expect.any(AbortSignal),
       },
     );
     expect(result).toMatchObject({
@@ -113,7 +115,7 @@ describe("Unsplash client", () => {
     expect(cacheLife).toHaveBeenCalledWith("hours");
   });
 
-  it("gets and maps full photo details without a cache error boundary", async () => {
+  it("gets, caches, and maps full photo details", async () => {
     const fetchMock = vi.fn().mockResolvedValue(
       mockResponse({
         ...apiPhoto,
@@ -129,6 +131,7 @@ describe("Unsplash client", () => {
       "https://api.unsplash.com/photos/photo%2Fid",
       {
         headers: { Authorization: "Client-ID test-access-key" },
+        signal: expect.any(AbortSignal),
       },
     );
     expect(result).toMatchObject({
@@ -137,7 +140,7 @@ describe("Unsplash client", () => {
       tags: [{ title: "mountain" }],
       location: null,
     });
-    expect(cacheLife).not.toHaveBeenCalled();
+    expect(cacheLife).toHaveBeenCalledWith("minutes");
   });
 
   it("rejects malformed API payloads at the transport boundary", async () => {
@@ -178,6 +181,22 @@ describe("Unsplash client", () => {
 
     await expect(listPhotos()).rejects.toMatchObject({
       category: "network",
+      status: null,
+    });
+  });
+
+  it("normalizes aborted requests as timeout errors", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockRejectedValue(
+          new DOMException("Request timed out", "TimeoutError"),
+        ),
+    );
+
+    await expect(listPhotos()).rejects.toMatchObject({
+      category: "timeout",
       status: null,
     });
   });

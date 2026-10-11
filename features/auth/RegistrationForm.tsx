@@ -33,6 +33,8 @@ const defaultValues: RegistrationFormValues = {
   terms: false,
 };
 
+const TERMS_ERROR_ID = "registration-terms-error";
+
 export function RegistrationForm() {
   const dispatch = useAppDispatch();
   const router = useRouter();
@@ -180,12 +182,22 @@ export function RegistrationForm() {
                   name={field.name}
                   onBlur={field.onBlur}
                   onChange={(_, checked) => field.onChange(checked)}
-                  slotProps={{ input: { ref: field.ref } }}
+                  slotProps={{
+                    input: {
+                      ref: field.ref,
+                      "aria-describedby": fieldState.invalid
+                        ? TERMS_ERROR_ID
+                        : undefined,
+                      "aria-invalid": fieldState.invalid,
+                    },
+                  }}
                 />
               }
               label="I understand this is a local demo account"
             />
-            <FormHelperText>{fieldState.error?.message}</FormHelperText>
+            <FormHelperText id={TERMS_ERROR_ID}>
+              {fieldState.error?.message}
+            </FormHelperText>
           </FormControl>
         )}
       />

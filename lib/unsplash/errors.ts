@@ -5,6 +5,7 @@ export type UnsplashErrorCategory =
   | "rate-limit"
   | "not-found"
   | "network"
+  | "timeout"
   | "invalid-response"
   | "unknown";
 
@@ -60,6 +61,21 @@ export function createUnsplashHttpError(status: number): UnsplashApiError {
 export function normalizeUnsplashError(error: unknown): UnsplashApiError {
   if (error instanceof UnsplashApiError) {
     return error;
+  }
+
+  const errorName =
+    typeof error === "object" &&
+    error !== null &&
+    "name" in error &&
+    typeof error.name === "string"
+      ? error.name
+      : null;
+
+  if (errorName === "AbortError" || errorName === "TimeoutError") {
+    return new UnsplashApiError("The Unsplash request timed out.", {
+      category: "timeout",
+      cause: error,
+    });
   }
 
   if (error instanceof TypeError) {

@@ -77,4 +77,18 @@ describe("RegistrationForm", () => {
     });
     expect(JSON.stringify(store.getState())).not.toContain("password1");
   });
+
+  it("associates the terms validation message with the checkbox", async () => {
+    const user = userEvent.setup();
+    renderWithStore(<RegistrationForm />);
+
+    const checkbox = screen.getByRole("checkbox");
+    await user.click(
+      screen.getByRole("button", { name: "Create demo profile" }),
+    );
+
+    const error = await screen.findByText("Accept the terms to continue");
+    expect(checkbox).toHaveAttribute("aria-invalid", "true");
+    expect(checkbox).toHaveAttribute("aria-describedby", error.id);
+  });
 });

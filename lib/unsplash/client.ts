@@ -17,6 +17,7 @@ import {
 
 const UNSPLASH_API_URL = "https://api.unsplash.com/";
 const DEFAULT_PER_PAGE = 20;
+const UNSPLASH_REQUEST_TIMEOUT_MS = 10_000;
 
 interface UnsplashResponse<T> {
   data: T;
@@ -52,6 +53,7 @@ async function requestUnsplash<T>(
       headers: {
         Authorization: `Client-ID ${accessKey}`,
       },
+      signal: AbortSignal.timeout(UNSPLASH_REQUEST_TIMEOUT_MS),
     });
 
     if (!response.ok) {
@@ -135,6 +137,9 @@ export async function searchPhotos(
 }
 
 export async function getPhoto(id: string): Promise<PhotoDetails> {
+  "use cache";
+  cacheLife("minutes");
+
   const response = await requestUnsplash(
     `photos/${encodeURIComponent(id)}`,
     unsplashApiPhotoDetailsSchema,

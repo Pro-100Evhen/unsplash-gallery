@@ -12,6 +12,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import type { PhotoDetails as PhotoDetailsDto } from "@/domain/photo/types";
+import { SavePhotoButton } from "@/features/collection/SavePhotoButton";
 import styles from "./PhotoDetails.module.scss";
 
 const ATTRIBUTION_PARAMS = {
@@ -61,6 +62,9 @@ export function PhotoDetails({ photo }: PhotoDetailsProps) {
   return (
     <article className={styles.details}>
       <Box className={styles.imageFrame}>
+        <Box className={styles.saveControl}>
+          <SavePhotoButton photo={photo} />
+        </Box>
         <Image
           className={styles.image}
           src={photo.urls.regular}

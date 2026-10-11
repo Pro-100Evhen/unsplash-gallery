@@ -14,6 +14,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import type { GalleryPhoto } from "@/domain/photo/types";
+import { SavePhotoButton } from "@/features/collection/SavePhotoButton";
 import type { GalleryDensity } from "./types";
 import styles from "./PhotoCard.module.scss";
 
@@ -49,6 +50,9 @@ export function PhotoCard({ photo, density, eager = false }: PhotoCardProps) {
 
   return (
     <Card component="article" elevation={0} className={styles.card}>
+      <Box className={styles.saveControl}>
+        <SavePhotoButton photo={photo} />
+      </Box>
       <CardActionArea
         component={Link}
         className={styles.imageLink}

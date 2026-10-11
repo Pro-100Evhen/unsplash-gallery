@@ -1,7 +1,8 @@
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { PaginatedPhotos } from "@/domain/photo/types";
 import { galleryPhotoFixture } from "@/test/fixtures/photos";
+import { renderWithStore } from "@/test/renderWithStore";
 
 const { redirectMock, searchPhotosMock } = vi.hoisted(() => ({
   redirectMock: vi.fn(() => {
@@ -48,7 +49,7 @@ describe("SearchResults", () => {
   });
 
   it("does not request Unsplash for an empty query", async () => {
-    render(
+    renderWithStore(
       await SearchResults({
         parsed: { valid: false, reason: "empty-query", page: 1, perPage: 20 },
       }),
@@ -60,7 +61,7 @@ describe("SearchResults", () => {
 
   it("requests and server-renders the selected search page", async () => {
     searchPhotosMock.mockResolvedValue(response);
-    render(
+    renderWithStore(
       await SearchResults({
         parsed: { valid: true, query: "forest", page: 2, perPage: 20 },
       }),
@@ -75,7 +76,7 @@ describe("SearchResults", () => {
 
   it("renders a distinct zero-results state", async () => {
     searchPhotosMock.mockResolvedValue({ ...response, items: [], total: 0 });
-    render(
+    renderWithStore(
       await SearchResults({
         parsed: { valid: true, query: "nothing", page: 1, perPage: 20 },
       }),

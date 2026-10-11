@@ -1,12 +1,12 @@
 "use client";
 
 import { Stack, Typography } from "@mui/material";
-import { useState } from "react";
 import type { GalleryPhoto } from "@/domain/photo/types";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { Gallery } from "./Gallery";
 import { GalleryControls } from "./GalleryControls";
 import { GalleryPagination } from "./GalleryPagination";
-import type { GalleryDensity } from "./types";
+import { selectDensity, setDensity } from "./preferencesSlice";
 
 type GalleryViewProps = Readonly<{
   photos: GalleryPhoto[];
@@ -21,7 +21,8 @@ export function GalleryView({
   page = 1,
   totalPages = null,
 }: GalleryViewProps) {
-  const [density, setDensity] = useState<GalleryDensity>("comfortable");
+  const dispatch = useAppDispatch();
+  const density = useAppSelector(selectDensity);
 
   return (
     <>
@@ -46,7 +47,10 @@ export function GalleryView({
         >
           {title}
         </Typography>
-        <GalleryControls density={density} onDensityChange={setDensity} />
+        <GalleryControls
+          density={density}
+          onDensityChange={(nextDensity) => dispatch(setDensity(nextDensity))}
+        />
       </Stack>
       <Gallery photos={photos} density={density} />
       {totalPages !== null && totalPages > 1 ? (

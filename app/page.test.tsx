@@ -1,7 +1,8 @@
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { PaginatedPhotos } from "@/domain/photo/types";
 import { galleryPhotoFixture } from "@/test/fixtures/photos";
+import { renderWithStore } from "@/test/renderWithStore";
 
 const { listPhotosMock, redirectMock } = vi.hoisted(() => ({
   listPhotosMock: vi.fn(),
@@ -42,7 +43,7 @@ describe("PhotoFeed", () => {
 
   it("returns photo content from the selected server page", async () => {
     listPhotosMock.mockResolvedValue(response);
-    render(await PhotoFeed({ page: 1 }));
+    renderWithStore(await PhotoFeed({ page: 1 }));
 
     expect(listPhotosMock).toHaveBeenCalledWith(1, 20);
     expect(
@@ -52,7 +53,7 @@ describe("PhotoFeed", () => {
 
   it("returns an empty state when Unsplash has no photos", async () => {
     listPhotosMock.mockResolvedValue({ ...response, items: [], total: 0 });
-    render(await PhotoFeed({ page: 1 }));
+    renderWithStore(await PhotoFeed({ page: 1 }));
 
     expect(screen.getByRole("status")).toHaveTextContent("No photos yet");
   });
@@ -64,7 +65,7 @@ describe("PhotoFeed", () => {
       total: 60,
       totalPages: 3,
     });
-    render(await PhotoFeed({ page: 3 }));
+    renderWithStore(await PhotoFeed({ page: 3 }));
 
     expect(listPhotosMock).toHaveBeenCalledWith(3, 20);
   });

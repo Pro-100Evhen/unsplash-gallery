@@ -3,6 +3,7 @@
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v16-appRouter";
 import { ThemeProvider } from "@mui/material/styles";
 import type { ReactNode } from "react";
+import { StoreProvider } from "@/store/StoreProvider";
 import theme from "./theme";
 
 type AppProvidersProps = Readonly<{
@@ -11,8 +12,10 @@ type AppProvidersProps = Readonly<{
 
 export default function AppProviders({ children }: AppProvidersProps) {
   return (
-    <AppRouterCacheProvider options={{ enableCssLayer: true }}>
-      <ThemeProvider theme={theme}>{children}</ThemeProvider>
-    </AppRouterCacheProvider>
+    <StoreProvider>
+      <AppRouterCacheProvider options={{ enableCssLayer: true }}>
+        <ThemeProvider theme={theme}>{children}</ThemeProvider>
+      </AppRouterCacheProvider>
+    </StoreProvider>
   );
 }

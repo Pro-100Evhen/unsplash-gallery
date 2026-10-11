@@ -33,6 +33,13 @@
   opacity: 0.68;
 }
 
+.navigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: tokens.$space-3;
+}
+
 .search {
   width: 100%;
   min-width: 0;

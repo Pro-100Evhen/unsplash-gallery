@@ -1,7 +1,8 @@
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { UnsplashApiError } from "@/lib/unsplash/errors";
 import { photoDetailsFixture } from "@/test/fixtures/photos";
+import { renderWithStore } from "@/test/renderWithStore";
 
 const { getPhotoMock, notFoundMock } = vi.hoisted(() => ({
   getPhotoMock: vi.fn(),
@@ -24,7 +25,9 @@ describe("PhotoPage", () => {
   it("server-renders details for the decoded route id", async () => {
     getPhotoMock.mockResolvedValue(photoDetailsFixture);
 
-    render(await PhotoPage({ params: Promise.resolve({ id: "photo/one" }) }));
+    renderWithStore(
+      await PhotoPage({ params: Promise.resolve({ id: "photo/one" }) }),
+    );
 
     expect(getPhotoMock).toHaveBeenCalledWith("photo/one");
     expect(

@@ -1,12 +1,13 @@
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import type { PhotoDetails as PhotoDetailsDto } from "@/domain/photo/types";
 import { photoDetailsFixture } from "@/test/fixtures/photos";
+import { renderWithStore } from "@/test/renderWithStore";
 import { PhotoDetails } from "./PhotoDetails";
 
 describe("PhotoDetails", () => {
   it("renders the complete photo metadata and attribution", () => {
-    render(<PhotoDetails photo={photoDetailsFixture} />);
+    renderWithStore(<PhotoDetails photo={photoDetailsFixture} />);
 
     expect(
       screen.getByRole("heading", { name: "Photo by Ada Example", level: 1 }),
@@ -32,7 +33,7 @@ describe("PhotoDetails", () => {
   });
 
   it("links tags to encoded tag routes", () => {
-    render(
+    renderWithStore(
       <PhotoDetails
         photo={{
           ...photoDetailsFixture,
@@ -63,7 +64,7 @@ describe("PhotoDetails", () => {
       },
     };
 
-    render(<PhotoDetails photo={minimalPhoto} />);
+    renderWithStore(<PhotoDetails photo={minimalPhoto} />);
 
     expect(screen.queryByText("Mountain lake")).not.toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Tags" })).toBeNull();

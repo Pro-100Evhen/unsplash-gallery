@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { galleryPhotoFixture } from "@/test/fixtures/photos";
+import { renderWithStore } from "@/test/renderWithStore";
 import { Gallery } from "./Gallery";
 import styles from "./Gallery.module.scss";
 
@@ -15,7 +16,7 @@ describe("Gallery", () => {
       },
     ];
 
-    render(<Gallery photos={photos} density="comfortable" />);
+    renderWithStore(<Gallery photos={photos} density="comfortable" />);
 
     expect(screen.getAllByRole("listitem")).toHaveLength(2);
     expect(
@@ -29,7 +30,9 @@ describe("Gallery", () => {
   it.each(["comfortable", "compact"] as const)(
     "maps the %s density to a dedicated layout class",
     (density) => {
-      render(<Gallery photos={[galleryPhotoFixture]} density={density} />);
+      renderWithStore(
+        <Gallery photos={[galleryPhotoFixture]} density={density} />,
+      );
 
       expect(screen.getByRole("list", { name: "Photo gallery" })).toHaveClass(
         styles[density],

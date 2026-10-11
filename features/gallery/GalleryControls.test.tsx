@@ -1,13 +1,14 @@
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import { galleryPhotoFixture } from "@/test/fixtures/photos";
+import { renderWithStore } from "@/test/renderWithStore";
 import { GalleryView } from "./GalleryView";
 
 describe("GalleryControls", () => {
   it("starts in comfortable mode and switches to compact mode", async () => {
     const user = userEvent.setup();
-    render(<GalleryView photos={[galleryPhotoFixture]} />);
+    renderWithStore(<GalleryView photos={[galleryPhotoFixture]} />);
 
     const comfortableButton = screen.getByRole("button", {
       name: "Comfortable gallery view",
@@ -29,7 +30,7 @@ describe("GalleryControls", () => {
 
   it("keeps the selected mode when its button is clicked again", async () => {
     const user = userEvent.setup();
-    render(<GalleryView photos={[galleryPhotoFixture]} />);
+    renderWithStore(<GalleryView photos={[galleryPhotoFixture]} />);
     const comfortableButton = screen.getByRole("button", {
       name: "Comfortable gallery view",
     });
@@ -41,7 +42,7 @@ describe("GalleryControls", () => {
 
   it("supports keyboard navigation and activation", async () => {
     const user = userEvent.setup();
-    render(<GalleryView photos={[galleryPhotoFixture]} />);
+    renderWithStore(<GalleryView photos={[galleryPhotoFixture]} />);
 
     await user.tab();
     expect(

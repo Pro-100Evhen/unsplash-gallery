@@ -1,11 +1,13 @@
 import { Box, Typography } from "@mui/material";
+import type { ReactNode } from "react";
 
 type EmptyStateProps = Readonly<{
   title: string;
   description: string;
+  action?: ReactNode;
 }>;
 
-export function EmptyState({ title, description }: EmptyStateProps) {
+export function EmptyState({ title, description, action }: EmptyStateProps) {
   return (
     <Box
       role="status"
@@ -19,6 +21,7 @@ export function EmptyState({ title, description }: EmptyStateProps) {
         {title}
       </Typography>
       <Typography color="text.secondary">{description}</Typography>
+      {action ? <Box sx={{ mt: 3 }}>{action}</Box> : null}
     </Box>
   );
 }

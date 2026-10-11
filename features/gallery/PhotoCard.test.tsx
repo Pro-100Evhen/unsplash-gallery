@@ -1,13 +1,14 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { galleryPhotoFixture } from "@/test/fixtures/photos";
+import { renderWithStore } from "@/test/renderWithStore";
 import { PhotoCard } from "./PhotoCard";
 
 const photoFixture = { ...galleryPhotoFixture, id: "photo/one" };
 
 describe("PhotoCard", () => {
   it("links the image to the encoded photo details route without nesting attribution links", () => {
-    render(<PhotoCard photo={photoFixture} density="comfortable" />);
+    renderWithStore(<PhotoCard photo={photoFixture} density="comfortable" />);
 
     const detailsLink = screen.getByRole("link", {
       name: `View ${photoFixture.altDescription}`,
@@ -18,7 +19,7 @@ describe("PhotoCard", () => {
   });
 
   it("preserves image dimensions and accessible fallback text", () => {
-    render(
+    renderWithStore(
       <PhotoCard
         photo={{ ...photoFixture, altDescription: "Photo by Ada Example" }}
         density="comfortable"
@@ -33,7 +34,7 @@ describe("PhotoCard", () => {
   });
 
   it("shows a MUI skeleton until the photo finishes loading", async () => {
-    render(<PhotoCard photo={photoFixture} density="comfortable" />);
+    renderWithStore(<PhotoCard photo={photoFixture} density="comfortable" />);
 
     const image = screen.getByRole("img", {
       name: photoFixture.altDescription,
@@ -56,7 +57,7 @@ describe("PhotoCard", () => {
   });
 
   it("adds Unsplash attribution parameters to external links", () => {
-    render(<PhotoCard photo={photoFixture} density="comfortable" />);
+    renderWithStore(<PhotoCard photo={photoFixture} density="comfortable" />);
 
     for (const name of ["Ada Example", "Unsplash"]) {
       const link = screen.getByRole("link", { name });
@@ -73,14 +74,16 @@ describe("PhotoCard", () => {
   ] as const)(
     "uses responsive image sizes for %s density",
     (density, sizes) => {
-      render(<PhotoCard photo={photoFixture} density={density} />);
+      renderWithStore(<PhotoCard photo={photoFixture} density={density} />);
 
       expect(screen.getByRole("img")).toHaveAttribute("sizes", sizes);
     },
   );
 
   it("eagerly loads an above-the-fold photo when requested", () => {
-    render(<PhotoCard photo={photoFixture} density="comfortable" eager />);
+    renderWithStore(
+      <PhotoCard photo={photoFixture} density="comfortable" eager />,
+    );
 
     expect(screen.getByRole("img")).toHaveAttribute("loading", "eager");
   });

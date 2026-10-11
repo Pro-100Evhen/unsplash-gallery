@@ -8,6 +8,7 @@
 }
 
 .imageFrame {
+  position: relative;
   display: grid;
   min-height: 280px;
   max-height: min(72vh, 900px);
@@ -15,6 +16,13 @@
   overflow: hidden;
   border-radius: 16px;
   background: #f3f3f3;
+}
+
+.saveControl {
+  position: absolute;
+  z-index: 2;
+  top: tokens.$space-4;
+  right: tokens.$space-4;
 }
 
 .image {

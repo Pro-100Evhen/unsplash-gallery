@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { SearchForm } from "@/features/search/SearchForm";
 import { AppHeaderBrand } from "./AppHeaderBrand";
+import { AppHeaderCollectionLink } from "./AppHeaderCollectionLink";
 import styles from "./AppHeader.module.scss";
 
 type AppHeaderProps = Readonly<{
@@ -20,7 +21,10 @@ export function AppHeader({ initialQuery = "" }: AppHeaderProps) {
     >
       <PageContainer>
         <Toolbar disableGutters className={styles.toolbar}>
-          <AppHeaderBrand />
+          <nav className={styles.navigation} aria-label="Primary navigation">
+            <AppHeaderBrand />
+            <AppHeaderCollectionLink />
+          </nav>
           <div className={styles.search}>
             <Suspense fallback={null}>
               <SearchForm initialQuery={initialQuery} />

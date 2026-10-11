@@ -9,6 +9,9 @@ import {
 
 const validState = {
   version: PERSISTENCE_VERSION,
+  auth: {
+    user: { id: "user-1", name: "Ada Lovelace", email: "ada@example.com" },
+  },
   collection: { items: [galleryPhotoFixture] },
   preferences: { density: "compact" as const },
 };
@@ -16,6 +19,30 @@ const validState = {
 describe("persistence", () => {
   it("parses a valid versioned state", () => {
     expect(parsePersistedState(JSON.stringify(validState))).toEqual(validState);
+  });
+
+  it("migrates version 1 state without losing saved photos", () => {
+    const legacyState = {
+      version: 1,
+      collection: validState.collection,
+      preferences: validState.preferences,
+    };
+
+    expect(parsePersistedState(JSON.stringify(legacyState))).toEqual({
+      ...validState,
+      auth: { user: null },
+    });
+  });
+
+  it("rejects sensitive or unknown auth fields", () => {
+    expect(
+      parsePersistedState(
+        JSON.stringify({
+          ...validState,
+          auth: { ...validState.auth, password: "password1" },
+        }),
+      ),
+    ).toBeNull();
   });
 
   it.each([

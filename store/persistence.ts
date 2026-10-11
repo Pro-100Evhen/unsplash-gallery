@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const PERSISTENCE_VERSION = 1 as const;
+export const PERSISTENCE_VERSION = 2 as const;
 export const PERSISTENCE_STORAGE_KEY = "arounda-photo-gallery";
 
 const savedPhotoSchema = z
@@ -22,14 +22,33 @@ const savedPhotoSchema = z
   })
   .strict();
 
+const authSchema = z
+  .object({
+    user: z
+      .object({
+        id: z.string().min(1),
+        name: z.string().min(1),
+        email: z.string().email(),
+      })
+      .strict()
+      .nullable(),
+  })
+  .strict();
+
 const persistedStateSchema = z
   .object({
     version: z.literal(PERSISTENCE_VERSION),
+    auth: authSchema,
     collection: z.object({ items: z.array(savedPhotoSchema) }).strict(),
     preferences: z
       .object({ density: z.enum(["comfortable", "compact"]) })
       .strict(),
   })
+  .strict();
+
+const legacyPersistedStateSchema = persistedStateSchema
+  .omit({ auth: true, version: true })
+  .extend({ version: z.literal(1) })
   .strict();
 
 export type PersistedState = z.infer<typeof persistedStateSchema>;
@@ -49,8 +68,16 @@ export function parsePersistedState(
   try {
     const parsed: unknown = JSON.parse(value);
     const result = persistedStateSchema.safeParse(parsed);
+    if (result.success) return result.data;
 
-    return result.success ? result.data : null;
+    const legacyResult = legacyPersistedStateSchema.safeParse(parsed);
+    return legacyResult.success
+      ? {
+          ...legacyResult.data,
+          version: PERSISTENCE_VERSION,
+          auth: { user: null },
+        }
+      : null;
   } catch {
     return null;
   }

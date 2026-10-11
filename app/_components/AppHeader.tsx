@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { SearchForm } from "@/features/search/SearchForm";
 import { AppHeaderBrand } from "./AppHeaderBrand";
+import { AppHeaderAccountLink } from "./AppHeaderAccountLink";
 import { AppHeaderCollectionLink } from "./AppHeaderCollectionLink";
 import styles from "./AppHeader.module.scss";
 
@@ -24,6 +25,7 @@ export function AppHeader({ initialQuery = "" }: AppHeaderProps) {
           <nav className={styles.navigation} aria-label="Primary navigation">
             <AppHeaderBrand />
             <AppHeaderCollectionLink />
+            <AppHeaderAccountLink />
           </nav>
           <div className={styles.search}>
             <Suspense fallback={null}>

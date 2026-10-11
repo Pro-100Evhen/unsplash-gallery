@@ -4,6 +4,7 @@ import { useEffect, type ReactNode } from "react";
 import { Provider } from "react-redux";
 import { hydrateCollection } from "@/features/collection/collectionSlice";
 import { setDensity } from "@/features/gallery/preferencesSlice";
+import { registerDemoUser } from "@/features/auth/authSlice";
 import { makeStore, type AppStore } from "./index";
 import {
   PERSISTENCE_VERSION,
@@ -27,6 +28,9 @@ export function StoreProvider({ children, store }: StoreProviderProps) {
     const persistedState = readPersistedState(window.localStorage);
 
     if (persistedState) {
+      if (persistedState.auth.user) {
+        appStore.dispatch(registerDemoUser(persistedState.auth.user));
+      }
       appStore.dispatch(hydrateCollection(persistedState.collection.items));
       appStore.dispatch(setDensity(persistedState.preferences.density));
     }
@@ -36,6 +40,7 @@ export function StoreProvider({ children, store }: StoreProviderProps) {
 
       writePersistedState(window.localStorage, {
         version: PERSISTENCE_VERSION,
+        auth: state.auth,
         collection: state.collection,
         preferences: state.preferences,
       });

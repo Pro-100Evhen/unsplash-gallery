@@ -1,6 +1,7 @@
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import type { AnchorHTMLAttributes } from "react";
 import { describe, expect, it, vi } from "vitest";
+import { renderWithStore } from "@/test/renderWithStore";
 import { AppHeader } from "./AppHeader";
 
 vi.mock("next/link", () => ({
@@ -16,7 +17,7 @@ vi.mock("next/navigation", () => ({
 
 describe("AppHeader", () => {
   it("renders distinct home and search landmarks", () => {
-    render(<AppHeader />);
+    renderWithStore(<AppHeader />);
 
     expect(screen.getByRole("banner")).toBeInTheDocument();
     expect(
@@ -25,13 +26,17 @@ describe("AppHeader", () => {
     const collectionLink = screen.getByRole("link", { name: /Collection/ });
     expect(collectionLink).toHaveAttribute("href", "/profile");
     expect(collectionLink).toHaveAttribute("data-next-link", "true");
+    expect(screen.getByRole("link", { name: /Register/ })).toHaveAttribute(
+      "href",
+      "/register",
+    );
     expect(
       screen.getByRole("search", { name: "Photo search" }),
     ).toBeInTheDocument();
   });
 
   it("forwards the initial query to the search form", () => {
-    render(<AppHeader initialQuery="desert" />);
+    renderWithStore(<AppHeader initialQuery="desert" />);
 
     expect(
       screen.getByRole("searchbox", { name: "Search photos" }),

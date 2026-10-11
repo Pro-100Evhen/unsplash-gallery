@@ -1,0 +1,8 @@
+@use "../../styles/tokens" as tokens;
+
+.form {
+  display: grid;
+  gap: tokens.$space-4;
+  width: min(100%, 520px);
+  margin-inline: auto;
+}

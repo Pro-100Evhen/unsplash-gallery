@@ -9,6 +9,11 @@
   box-sizing: border-box;
 }
 
+/* MUI inputs size their content and vertical padding with content-box. */
+.MuiInputBase-input {
+  box-sizing: content-box;
+}
+
 html,
 body {
   min-height: 100%;

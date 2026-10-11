@@ -1,10 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { collectionReducer } from "@/features/collection/collectionSlice";
 import { preferencesReducer } from "@/features/gallery/preferencesSlice";
+import { authReducer } from "@/features/auth/authSlice";
 
 export function makeStore() {
   return configureStore({
     reducer: {
+      auth: authReducer,
       collection: collectionReducer,
       preferences: preferencesReducer,
     },

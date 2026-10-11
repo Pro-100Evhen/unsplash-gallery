@@ -4,6 +4,7 @@ import { Button, Typography } from "@mui/material";
 import { EmptyState } from "@/components/feedback/EmptyState";
 import { GalleryView } from "@/features/gallery/GalleryView";
 import { useAppSelector } from "@/store/hooks";
+import { ProfileIdentity } from "@/features/auth/ProfileIdentity";
 import { selectSavedPhotos } from "./collectionSlice";
 
 export function ProfileCollection() {
@@ -15,6 +16,7 @@ export function ProfileCollection() {
         <Typography component="h1" variant="h2">
           My collection
         </Typography>
+        <ProfileIdentity />
         <EmptyState
           title="Your collection is empty"
           description="Save photos from the gallery to find them here."
@@ -28,5 +30,10 @@ export function ProfileCollection() {
     );
   }
 
-  return <GalleryView photos={photos} title="My collection" />;
+  return (
+    <>
+      <ProfileIdentity />
+      <GalleryView photos={photos} title="My collection" />
+    </>
+  );
 }
